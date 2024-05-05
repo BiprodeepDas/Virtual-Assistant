@@ -1,0 +1,29 @@
+{
+  "intents": [
+    {
+      "tag" : "open",
+      "patterns" : ["open","launch","start"],
+      "responses" : ["open"]
+    },{
+      "tag" : "Find",
+      "patterns" : ["find","search","locate","file","folder","location of"],
+      "responses" : ["find"]
+    },{
+      "tag" : "Visit",
+      "patterns" : ["Visit","goto","site","www",".com","whatsapp","facebook","instagram","youtube",""],
+      "responses" : ["visit"]
+    },{
+      "tag" : "",
+      "patterns" : [],
+      "responses" : [""]
+    },{
+      "tag" : "",
+      "patterns" : [],
+      "responses" : [""]
+    },{
+      "tag" : "",
+      "patterns" : [],
+      "responses" : [""]
+    }
+  ]
+}

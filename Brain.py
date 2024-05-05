@@ -20,5 +20,5 @@ def reply(quest):
     return answer
 
 # while True:
-# i = input("Enter : ")
-# print(reply(i))
+#     i = input("Enter : ")
+#     print(reply(i))

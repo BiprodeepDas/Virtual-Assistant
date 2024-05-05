@@ -1,12 +1,20 @@
+from open import execute
 import pyttsx3
-
 from datetime import datetime
-import webbrowser
 import speech_recognition as sr
 from googletrans import Translator
 import httpcore
 
 setattr(httpcore, 'SyncHTTPTransport', 'AsyncHTTPProxy')
+
+
+def internetConnectionChecker():
+    import subprocess
+    try:
+        subprocess.check_output(["ping", "-c", "1", "8.8.8.8"])
+        return True
+    except subprocess.CalledProcessError:
+        return False
 
 
 def speak(text):
@@ -36,21 +44,53 @@ def takeCommand():
     print("Choose type of command 1. For speech 2. For text")
     c = input()
     if c == "2":
-        query = input("Enter task :")
+        query = input("Enter index no. :")
         return query
     if c == "1":
         r = sr.Recognizer()
         mic = sr.Microphone()
         with mic as source:
             r.adjust_for_ambient_noise(source)
-            print('Say somthing')
+            print('Speak now')
             audio = r.listen(source)
 
-            voice_data = r.recognize_google(audio, language="en-In")
-            return voice_data
+            try:
+                voice_data = r.recognize_google(audio, language="en-In")
+            except:
+                del voice_data
+                takeCommand()
+            return voice_data.lower()
 
     else:
         print("Wrong choice")
+        takeCommand()
+
+
+def takeQuestion():
+    print("Choose type of input form 1. For speech 2. For text")
+    c = input()
+    if c == "2":
+        query = input("Give your input :")
+        return query
+    if c == "1":
+        r = sr.Recognizer()
+        mic = sr.Microphone()
+        with mic as source:
+            r.adjust_for_ambient_noise(source)
+            print('Speak now ')
+            audio = r.listen(source)
+
+            try:
+                voice_data = r.recognize_google(audio, language="en-In")
+                if internetConnectionChecker():
+                    voice_data=Translation(voice_data)
+            except:
+                takeQuestion()
+            return voice_data.lower()
+
+    else:
+        print("Wrong choice")
+        takeCommand()
 
 
 def Translation(text):
@@ -58,49 +98,115 @@ def Translation(text):
     translate = Translator()
     result = translate.translate(l)
     data = result.text
-    print(f"you :{data}.")
+    # print(f"you :{data}.")
     return data
 
 
 if __name__ == '__main__':
     print("pycharm")
     d, t = dateTime()
-    speak("Hello i am Hector A  I")
-    speak(f"current date is {d}")
-    speak(f"and current time is {t}")
+    # speak("Hello i am Hector , Your Virtual Assistant")
+    # speak(f"current date is {d}")
+    # speak(f"and current time is {t}")
+    # speak(
+    #     "I can also suggest medicines and remedies for basic health issues to enable this mode please enter M in input Thankyou! ")
+    print("As a prototype currently i can assist you in the following categories of tasks :")
+
     while True:
-        out = takeCommand().lower()
-        # out = Translation(text)
+        print("\n\n1.For solving study related problems (problems of class 10-12 level).*(Requires Internet connection)*\n"
+              "2.Launch any application present in your System.\n"
+              "3.Find you the location of any virtual object that is present in your system.\n"
+              "4.Perform a web search on a given query.*(Requires Internet connection)*\n"
+              "5.Predict a disease based on given symptoms using ML.\n"
+              "6.Provide some known remedies for a particular given disease.*(Requires Internet connection for new search)*\n"
+              "7.Chat randomly.*(Requires Internet connection for new search)*\n"
+              "8. to exit!.\n"
+              "***************\n"
+              "Please input the given Index number for respective operations that you want me to perform except normal chat\n"
+              "Please give instructions in English only in case of offline System\n"
+              "***************\n")
+        try:
+            out = takeCommand()
+            if internetConnectionChecker():
+                out = Translation(out)
+            dLen = len(out)
+            print(f"You : {out}")
+        except Exception as e:
+            print(f"Error!{e}. Please kindly retry! ")
+            continue
 
-        if 'exit' in out:
+        if out == '8' or out == 'eight':
             speak("Thank you.")
-            exit()
+            break
 
-        elif 'youtube' in out:
-            speak("Opening youtube for you..")
-            webbrowser.open("https://youtube.com")
-        elif 'facebook' in out:
-            speak("Opening face book for you..")
-            webbrowser.open("https://facebook.com")
-        elif 'wikipedia' in out:
-            speak("Opening wiki pedia for you..")
-            webbrowser.open("https://wikipedia.com")
-        elif 'blogger' in out:
-            speak("Opening blogger for you..")
-            webbrowser.open("https://blogger.com")
-        elif 'linkedin' in out:
-            speak("Opening linkdin for you..")
-            webbrowser.open("https://linkedin.com")
-        elif 'play music' in out:
-            from playsound import playsound
+        elif out == '1' or out == 'one':
+            try:
+                question = takeQuestion().lower()
+                quesLen = len(question)
 
-            # n=input("Enter name of song in download folder : ")
-            print("Playing your  music")
-            playsound('habibi.mp3')
+                if quesLen <= 3:
+                    pass
+
+                from questionanswer import replyques
+
+                replyques(question)
+            except Exception as e:
+                print(f"Error!{e}. Please kindly retry! ")
+
+        elif out == '2' or out == 'two':
+            try:
+                ip = takeQuestion()
+                execute("open" + ip)
+            except Exception as e:
+                print(f"Error!{e}. Please kindly retry! ")
+
+        elif out == '3' or out == 'three':
+            try:
+                ip = takeQuestion()
+                execute("search" + ip)
+            except Exception as e:
+                print(f"Error!{e}. Please kindly retry! ")
+
+        elif out == '4' or out == 'four':
+            try:
+                ip = takeQuestion()
+                execute("visit" + ip)
+            except Exception as e:
+                print(f"Error!{e}. Please kindly retry! ")
+
+        elif out == '5' or out == 'five':
+            print("Please enter 2 symptoms \n")
+            s1 = takeQuestion()
+            s2 = takeQuestion()
+            # s3=takeQuestion()
+            d = s1 + "," + s2  # + "," + s3
+            try:
+                from diseasPredic import takeD
+
+                takeD(d)
+            except Exception as e:
+                print(f"Error!{e}. Please kindly retry! ")
+
+        elif out == '6' or out == 'six':
+            try:
+                from medBrain import take
+
+                print("Please enter symptoms (MAx 2)\n")
+                ip = takeQuestion()
+                take(ip)
+            except Exception as e:
+                print(f"Error!{e}. Please kindly retry! ")
+
+        elif out == '7' or out == 'seven':
+            try:
+                ip = takeQuestion()
+                from Brain import reply
+                print(reply(ip))
+            except Exception as e:
+                print(f"Error!{e}. Please kindly retry! ")
 
         else:
-            from Brain import reply
-            print(reply(out))
+            print("You have chosen a wrong option.")
 
         # if 'what' in out.lower():
         # resp = reply(out.lower)
